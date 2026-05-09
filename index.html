@@ -1,0 +1,1150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FleetCopilot-EV — Edenred Mobility</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Azeret+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #0b0e0c;
+  --bg-deep: #06090a;
+  --bg-card: #111714;
+  --bg-elev: #1a221c;
+  --line: #2a342e;
+  --line-soft: #1f2823;
+  --green: #4ade80;
+  --green-glow: #4ade8050;
+  --green-deep: #14532d;
+  --cyan: #67e8f9;
+  --amber: #fbbf24;
+  --red: #f87171;
+  --magenta: #e879f9;
+  --text: #e5f0ea;
+  --text-mute: #7a8a82;
+  --text-dim: #4a5851;
+  --gradient: linear-gradient(135deg, #4ade80 0%, #67e8f9 100%);
+}
+* { margin:0; padding:0; box-sizing: border-box; }
+body {
+  font-family: 'Space Grotesk', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  background-image:
+    radial-gradient(circle at 12% 8%, rgba(74,222,128,.06) 0%, transparent 40%),
+    radial-gradient(circle at 88% 92%, rgba(103,232,249,.04) 0%, transparent 35%),
+    repeating-linear-gradient(0deg, transparent, transparent 31px, rgba(42,52,46,.18) 31px, rgba(42,52,46,.18) 32px);
+}
+.scan {
+  position: fixed; inset: 0; pointer-events: none;
+  background: linear-gradient(180deg, transparent 0%, rgba(74,222,128,.015) 50%, transparent 100%);
+  background-size: 100% 6px;
+  z-index: 1;
+  animation: scan 8s linear infinite;
+}
+@keyframes scan {
+  from { background-position: 0 0; }
+  to { background-position: 0 200px; }
+}
+.header {
+  border-bottom: 1px solid var(--line);
+  padding: .75rem 1.5rem;
+  display: flex; justify-content: space-between; align-items: center;
+  background: var(--bg-deep);
+  position: sticky; top: 0; z-index: 50;
+}
+.brand {
+  display: flex; align-items: center; gap: 1rem;
+}
+.brand-mark {
+  width: 38px; height: 38px;
+  border: 1.5px solid var(--green);
+  border-radius: 4px;
+  display: flex; align-items: center; justify-content: center;
+  background: rgba(74,222,128,.08);
+  position: relative;
+  box-shadow: 0 0 16px var(--green-glow), inset 0 0 12px rgba(74,222,128,.1);
+}
+.brand-mark::after {
+  content: '⚡'; font-size: 1.1rem; color: var(--green);
+}
+.brand-text {
+  font-weight: 700;
+  font-size: 1.1rem;
+  letter-spacing: -.02em;
+}
+.brand-text span { color: var(--green); }
+.brand-sub {
+  font-family: 'Azeret Mono', monospace;
+  font-size: .6rem;
+  color: var(--text-mute);
+  letter-spacing: .25em;
+  text-transform: uppercase;
+}
+.header-meta {
+  display: flex; gap: 1.25rem; align-items: center;
+  font-family: 'Azeret Mono', monospace;
+  font-size: .7rem;
+  color: var(--text-mute);
+}
+.header-meta span strong { color: var(--green); margin-left: 4px; font-weight: 600; }
+.live-dot {
+  width: 8px; height: 8px;
+  background: var(--green);
+  border-radius: 50%;
+  display: inline-block; margin-right: 6px;
+  box-shadow: 0 0 12px var(--green);
+  animation: blink 1.4s ease-in-out infinite;
+}
+@keyframes blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: .3; }
+}
+.main {
+  max-width: 1700px; margin: 0 auto;
+  padding: 1.25rem 1.5rem;
+  position: relative; z-index: 2;
+}
+.hero {
+  display: flex; justify-content: space-between; align-items: flex-end;
+  margin-bottom: 1.5rem;
+  padding-bottom: 1.5rem;
+  border-bottom: 1px dashed var(--line);
+}
+.hero h1 {
+  font-size: 2rem;
+  font-weight: 700;
+  letter-spacing: -.025em;
+  line-height: 1.05;
+}
+.hero h1 span {
+  background: var(--gradient);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+.hero-tag {
+  font-family: 'Azeret Mono', monospace;
+  font-size: .72rem;
+  color: var(--text-mute);
+  margin-top: .6rem;
+  letter-spacing: .05em;
+}
+.hero-meta {
+  text-align: right;
+  font-family: 'Azeret Mono', monospace;
+  font-size: .68rem;
+  color: var(--text-mute);
+  line-height: 1.7;
+  border-left: 1px solid var(--line);
+  padding-left: 1.25rem;
+}
+.hero-meta strong { color: var(--green); font-weight: 500; }
+
+.grid {
+  display: grid;
+  grid-template-columns: 380px 1fr 380px;
+  gap: 1rem;
+}
+@media (max-width: 1400px) {
+  .grid { grid-template-columns: 320px 1fr 320px; }
+}
+@media (max-width: 1100px) {
+  .grid { grid-template-columns: 1fr; }
+}
+
+.panel {
+  background: var(--bg-card);
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  overflow: hidden;
+}
+.panel-head {
+  padding: .65rem 1rem;
+  border-bottom: 1px solid var(--line);
+  background: var(--bg-deep);
+  display: flex; justify-content: space-between; align-items: center;
+}
+.panel-title {
+  font-family: 'Azeret Mono', monospace;
+  font-size: .68rem;
+  letter-spacing: .15em;
+  text-transform: uppercase;
+  color: var(--green);
+  font-weight: 600;
+}
+.panel-meta {
+  font-family: 'Azeret Mono', monospace;
+  font-size: .6rem;
+  color: var(--text-mute);
+}
+.panel-body { padding: 1rem; }
+
+/* Fleet list */
+.fleet-list {
+  max-height: 600px;
+  overflow-y: auto;
+}
+.vehicle {
+  padding: .8rem;
+  border: 1px solid var(--line-soft);
+  border-radius: 4px;
+  margin-bottom: .5rem;
+  cursor: pointer;
+  background: var(--bg-elev);
+  transition: all .2s;
+  position: relative;
+  overflow: hidden;
+}
+.vehicle:hover { border-color: var(--green); background: rgba(74,222,128,.05); }
+.vehicle.selected {
+  border-color: var(--green);
+  background: rgba(74,222,128,.1);
+  box-shadow: 0 0 0 1px var(--green), 0 0 20px rgba(74,222,128,.15);
+}
+.vehicle.selected::before {
+  content: ''; position: absolute; left: 0; top: 0; bottom: 0;
+  width: 3px; background: var(--green);
+}
+.v-row {
+  display: flex; justify-content: space-between; align-items: baseline;
+  margin-bottom: .25rem;
+}
+.v-id {
+  font-family: 'Azeret Mono', monospace;
+  font-size: .75rem;
+  color: var(--text);
+  font-weight: 600;
+}
+.v-driver {
+  font-size: .8rem;
+  color: var(--text);
+}
+.v-meta {
+  font-family: 'Azeret Mono', monospace;
+  font-size: .62rem;
+  color: var(--text-mute);
+}
+.v-status {
+  display: flex; align-items: center; gap: 6px;
+  font-family: 'Azeret Mono', monospace;
+  font-size: .62rem;
+  margin-top: .3rem;
+}
+.v-status-dot {
+  width: 6px; height: 6px; border-radius: 50%;
+}
+.v-status-dot.driving { background: var(--green); box-shadow: 0 0 6px var(--green); }
+.v-status-dot.charging { background: var(--cyan); box-shadow: 0 0 6px var(--cyan); }
+.v-status-dot.idle { background: var(--text-dim); }
+.v-status-dot.alert { background: var(--amber); animation: blink 1s infinite; }
+
+.v-bars {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 4px;
+  margin-top: .5rem;
+}
+.v-bar {
+  background: var(--bg);
+  border-radius: 2px;
+  padding: 4px 6px;
+  display: flex; justify-content: space-between; align-items: center;
+}
+.v-bar-label {
+  font-family: 'Azeret Mono', monospace;
+  font-size: .55rem;
+  color: var(--text-mute);
+  text-transform: uppercase;
+}
+.v-bar-val {
+  font-family: 'Azeret Mono', monospace;
+  font-size: .7rem;
+  font-weight: 600;
+}
+.v-bar-val.green { color: var(--green); }
+.v-bar-val.amber { color: var(--amber); }
+.v-bar-val.red { color: var(--red); }
+
+/* Center display */
+.detail-head {
+  padding: 1.25rem 1.5rem;
+  background: linear-gradient(180deg, var(--bg-deep) 0%, var(--bg-card) 100%);
+  border-bottom: 1px solid var(--line);
+}
+.detail-row {
+  display: flex; justify-content: space-between; align-items: flex-start;
+}
+.detail-id {
+  font-family: 'Azeret Mono', monospace;
+  font-size: .7rem;
+  color: var(--text-mute);
+}
+.detail-name {
+  font-size: 1.6rem;
+  font-weight: 700;
+  letter-spacing: -.02em;
+  margin: .15rem 0;
+}
+.detail-route {
+  font-family: 'Azeret Mono', monospace;
+  font-size: .7rem;
+  color: var(--cyan);
+}
+.detail-bigstat {
+  text-align: right;
+}
+.detail-charge {
+  font-size: 2.6rem;
+  font-weight: 700;
+  letter-spacing: -.04em;
+  font-family: 'Azeret Mono', monospace;
+  line-height: 1;
+}
+.detail-charge.high { color: var(--green); }
+.detail-charge.mid { color: var(--amber); }
+.detail-charge.low { color: var(--red); }
+.detail-charge-label {
+  font-family: 'Azeret Mono', monospace;
+  font-size: .6rem;
+  color: var(--text-mute);
+  margin-top: 4px;
+  text-transform: uppercase;
+  letter-spacing: .15em;
+}
+
+.detail-body {
+  padding: 1.25rem 1.5rem;
+}
+
+/* Agent strip */
+.agent-strip {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: .5rem;
+  margin-bottom: 1.25rem;
+}
+.agent {
+  background: var(--bg-deep);
+  border: 1px solid var(--line);
+  border-radius: 4px;
+  padding: .8rem;
+  position: relative;
+  overflow: hidden;
+  transition: all .3s;
+}
+.agent.active {
+  border-color: var(--green);
+  background: rgba(74,222,128,.06);
+}
+.agent.active::after {
+  content: ''; position: absolute;
+  bottom: 0; left: 0; height: 2px; width: 100%;
+  background: var(--green);
+  animation: scanBar 1.4s ease-in-out infinite;
+}
+@keyframes scanBar {
+  0%, 100% { transform: translateX(-100%); }
+  50% { transform: translateX(0); }
+}
+.agent-name {
+  font-family: 'Azeret Mono', monospace;
+  font-size: .65rem;
+  color: var(--text-mute);
+  text-transform: uppercase;
+  letter-spacing: .1em;
+  margin-bottom: 4px;
+}
+.agent-state {
+  font-size: .85rem;
+  font-weight: 600;
+  color: var(--text);
+}
+.agent.active .agent-state { color: var(--green); }
+.agent-icon {
+  font-size: 1rem;
+  margin-bottom: 2px;
+}
+
+/* Decision card */
+.decision {
+  background: linear-gradient(135deg, rgba(74,222,128,.08), rgba(103,232,249,.05));
+  border: 1px solid var(--green);
+  border-radius: 6px;
+  padding: 1.25rem;
+  position: relative;
+  overflow: hidden;
+}
+.decision::before {
+  content: 'AGENT DECISION'; position: absolute;
+  top: -8px; left: 12px;
+  background: var(--bg-card);
+  padding: 2px 8px;
+  font-family: 'Azeret Mono', monospace;
+  font-size: .55rem;
+  letter-spacing: .25em;
+  color: var(--green);
+  font-weight: 700;
+}
+.dec-head {
+  display: flex; align-items: baseline; justify-content: space-between;
+  margin-bottom: .75rem;
+}
+.dec-title {
+  font-size: 1.25rem;
+  font-weight: 700;
+  letter-spacing: -.02em;
+}
+.dec-conf {
+  font-family: 'Azeret Mono', monospace;
+  font-size: .75rem;
+  color: var(--green);
+}
+.dec-rationale {
+  font-size: .85rem;
+  color: var(--text-mute);
+  line-height: 1.5;
+  margin-bottom: .9rem;
+}
+.dec-actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: .5rem;
+  margin-bottom: .9rem;
+}
+.dec-action {
+  background: var(--bg-deep);
+  border: 1px solid var(--line);
+  border-radius: 4px;
+  padding: .6rem;
+}
+.dec-action-label {
+  font-family: 'Azeret Mono', monospace;
+  font-size: .55rem;
+  color: var(--text-mute);
+  text-transform: uppercase;
+  letter-spacing: .12em;
+  margin-bottom: 3px;
+}
+.dec-action-val {
+  font-family: 'Azeret Mono', monospace;
+  font-size: .85rem;
+  font-weight: 600;
+  color: var(--cyan);
+}
+.dec-savings {
+  display: flex; gap: 1.5rem;
+  padding-top: .8rem;
+  border-top: 1px dashed var(--line);
+  font-family: 'Azeret Mono', monospace;
+}
+.savings-item small {
+  font-size: .55rem;
+  color: var(--text-mute);
+  text-transform: uppercase;
+  letter-spacing: .1em;
+  display: block;
+}
+.savings-item b {
+  font-size: 1.15rem;
+  color: var(--green);
+  font-weight: 700;
+}
+
+/* Reasoning trace */
+.trace {
+  background: var(--bg-deep);
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  padding: .9rem;
+  font-family: 'Azeret Mono', monospace;
+  font-size: .68rem;
+  line-height: 1.7;
+  margin-top: 1.25rem;
+  max-height: 220px;
+  overflow-y: auto;
+}
+.trace-line {
+  padding: 1px 0;
+  display: flex; gap: 8px;
+  animation: fadeIn .25s;
+}
+@keyframes fadeIn { from {opacity: 0; transform: translateY(-3px);} to {opacity:1; transform: translateY(0);} }
+.trace-line .ts { color: var(--text-dim); flex-shrink: 0; }
+.trace-line .agnt { font-weight: 700; flex-shrink: 0; width: 64px; }
+.trace-line .agnt.charge { color: var(--cyan); }
+.trace-line .agnt.toll { color: var(--amber); }
+.trace-line .agnt.vat { color: var(--magenta); }
+.trace-line .agnt.maint { color: var(--green); }
+.trace-line .agnt.orch { color: var(--text); }
+.trace-line .msg { color: var(--text-mute); }
+
+/* Right panel */
+.kpi-stack {
+  display: grid;
+  gap: .6rem;
+}
+.kpi {
+  background: var(--bg-card);
+  border: 1px solid var(--line);
+  border-radius: 4px;
+  padding: 1rem;
+  position: relative;
+  overflow: hidden;
+}
+.kpi::before {
+  content: ''; position: absolute;
+  top: 0; left: 0; bottom: 0; width: 2px;
+  background: var(--green);
+}
+.kpi.cyan::before { background: var(--cyan); }
+.kpi.amber::before { background: var(--amber); }
+.kpi.magenta::before { background: var(--magenta); }
+.kpi-label {
+  font-family: 'Azeret Mono', monospace;
+  font-size: .58rem;
+  color: var(--text-mute);
+  text-transform: uppercase;
+  letter-spacing: .15em;
+  margin-bottom: 6px;
+}
+.kpi-val {
+  font-family: 'Azeret Mono', monospace;
+  font-size: 1.7rem;
+  font-weight: 700;
+  letter-spacing: -.02em;
+  color: var(--green);
+  line-height: 1;
+}
+.kpi.cyan .kpi-val { color: var(--cyan); }
+.kpi.amber .kpi-val { color: var(--amber); }
+.kpi.magenta .kpi-val { color: var(--magenta); }
+.kpi-sub {
+  font-size: .7rem;
+  color: var(--text-mute);
+  margin-top: 4px;
+}
+
+/* Map */
+.map {
+  position: relative;
+  background: var(--bg-deep);
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  height: 200px;
+  overflow: hidden;
+  margin-top: 1.25rem;
+}
+.map-grid {
+  position: absolute; inset: 0;
+  background-image:
+    linear-gradient(rgba(74,222,128,.07) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(74,222,128,.07) 1px, transparent 1px);
+  background-size: 24px 24px;
+}
+.map-route {
+  position: absolute;
+  height: 1.5px;
+  background: linear-gradient(90deg, var(--cyan), var(--green));
+  border-radius: 1px;
+  box-shadow: 0 0 6px var(--green-glow);
+  transform-origin: left;
+}
+.map-node {
+  position: absolute;
+  width: 8px; height: 8px;
+  border-radius: 50%;
+  border: 1.5px solid var(--green);
+  background: var(--bg-deep);
+  box-shadow: 0 0 12px var(--green-glow);
+}
+.map-node.charge {
+  border-color: var(--cyan);
+  box-shadow: 0 0 12px var(--cyan);
+  animation: chargePulse 1.6s ease-in-out infinite;
+}
+@keyframes chargePulse {
+  0%, 100% { box-shadow: 0 0 8px var(--cyan); transform: scale(1); }
+  50% { box-shadow: 0 0 22px var(--cyan); transform: scale(1.4); }
+}
+.map-node.vehicle {
+  width: 10px; height: 10px;
+  border-color: var(--amber);
+  background: var(--amber);
+  box-shadow: 0 0 16px var(--amber);
+}
+.map-label {
+  position: absolute;
+  font-family: 'Azeret Mono', monospace;
+  font-size: .55rem;
+  color: var(--text-mute);
+  letter-spacing: .1em;
+  text-transform: uppercase;
+}
+
+/* Controls */
+.actions {
+  display: flex; gap: .5rem;
+  flex-wrap: wrap;
+  margin-top: 1.25rem;
+}
+.btn {
+  padding: .6rem 1rem;
+  background: var(--bg-elev);
+  border: 1px solid var(--line);
+  color: var(--text);
+  font-family: 'Space Grotesk', sans-serif;
+  font-weight: 600;
+  font-size: .78rem;
+  cursor: pointer;
+  border-radius: 4px;
+  transition: all .2s;
+  display: inline-flex; align-items: center; gap: 6px;
+}
+.btn:hover { border-color: var(--green); color: var(--green); }
+.btn.primary {
+  background: var(--green-deep);
+  border-color: var(--green);
+  color: var(--green);
+  box-shadow: 0 0 12px var(--green-glow);
+}
+.btn.primary:hover {
+  background: var(--green);
+  color: var(--bg);
+}
+.btn.primary.active {
+  background: var(--green);
+  color: var(--bg);
+}
+
+/* Toast */
+.toast {
+  position: fixed; bottom: 1.5rem; right: 1.5rem;
+  background: var(--bg-card);
+  border: 1px solid var(--green);
+  border-radius: 4px;
+  padding: .9rem 1.1rem;
+  font-family: 'Azeret Mono', monospace;
+  font-size: .75rem;
+  box-shadow: 0 0 24px var(--green-glow);
+  transform: translateY(120px); opacity: 0;
+  transition: all .35s cubic-bezier(.2,.8,.2,1);
+  z-index: 200;
+  display: flex; align-items: center; gap: 12px;
+}
+.toast.show { transform: translateY(0); opacity: 1; }
+.toast-title { color: var(--green); font-weight: 700; }
+.toast-msg { color: var(--text-mute); font-size: .65rem; margin-top: 2px; }
+
+::-webkit-scrollbar { width: 4px; height: 4px; }
+::-webkit-scrollbar-track { background: var(--bg-deep); }
+::-webkit-scrollbar-thumb { background: var(--line); }
+::-webkit-scrollbar-thumb:hover { background: var(--green); }
+
+.footer {
+  margin-top: 1.5rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--line);
+  font-family: 'Azeret Mono', monospace;
+  font-size: .62rem;
+  color: var(--text-dim);
+  display: flex;
+  justify-content: space-between;
+  letter-spacing: .12em;
+}
+</style>
+</head>
+<body>
+<div class="scan"></div>
+
+<header class="header">
+  <div class="brand">
+    <div class="brand-mark"></div>
+    <div>
+      <div class="brand-text">FleetCopilot<span>·EV</span></div>
+      <div class="brand-sub">Edenred / mobility orchestrator</div>
+    </div>
+  </div>
+  <div class="header-meta">
+    <span><span class="live-dot"></span>fleet-link</span>
+    <span>vehicles<strong id="vehCount">— / —</strong></span>
+    <span>orchestrator<strong>4-agent</strong></span>
+    <span>region<strong>EU-DE-FR</strong></span>
+  </div>
+</header>
+
+<main class="main">
+  <section class="hero">
+    <div>
+      <h1>One agent for the driver. <span>Four agents</span> doing the math.</h1>
+      <p class="hero-tag">CHARGE · TOLL · VAT · MAINTENANCE — coordinated decisions for fleet-of-one across the EnBW + Edenred Mobility network.</p>
+    </div>
+    <div class="hero-meta">
+      <strong>SCOPE</strong> — Mobility business line<br>
+      <strong>ENTRY</strong> — telematics + driver app<br>
+      <strong>BACKBONE</strong> — LangGraph multi-agent · tool-calling<br>
+      <strong>SLO</strong> — &lt;800ms full plan
+    </div>
+  </section>
+
+  <div class="grid">
+    <!-- LEFT: Fleet -->
+    <div class="panel">
+      <div class="panel-head">
+        <div class="panel-title">▤ fleet roster</div>
+        <div class="panel-meta" id="fleetCount">12 active</div>
+      </div>
+      <div class="panel-body">
+        <div class="fleet-list" id="fleetList"></div>
+      </div>
+    </div>
+
+    <!-- CENTER: Vehicle detail + decision -->
+    <div class="panel">
+      <div class="detail-head">
+        <div class="detail-row">
+          <div>
+            <div class="detail-id" id="vehId">veh — / driver —</div>
+            <div class="detail-name" id="vehName">Select a vehicle</div>
+            <div class="detail-route" id="vehRoute">— → —</div>
+          </div>
+          <div class="detail-bigstat">
+            <div class="detail-charge mid" id="vehCharge">—</div>
+            <div class="detail-charge-label">SoC · battery</div>
+          </div>
+        </div>
+      </div>
+      <div class="detail-body">
+        <div class="agent-strip">
+          <div class="agent" data-agent="charge">
+            <div class="agent-icon">⚡</div>
+            <div class="agent-name">charge agent</div>
+            <div class="agent-state" id="ag-charge">idle</div>
+          </div>
+          <div class="agent" data-agent="toll">
+            <div class="agent-icon">🛣️</div>
+            <div class="agent-name">toll agent</div>
+            <div class="agent-state" id="ag-toll">idle</div>
+          </div>
+          <div class="agent" data-agent="vat">
+            <div class="agent-icon">📑</div>
+            <div class="agent-name">vat agent</div>
+            <div class="agent-state" id="ag-vat">idle</div>
+          </div>
+          <div class="agent" data-agent="maint">
+            <div class="agent-icon">🔧</div>
+            <div class="agent-name">maintenance agent</div>
+            <div class="agent-state" id="ag-maint">idle</div>
+          </div>
+        </div>
+
+        <div class="decision">
+          <div class="dec-head">
+            <div class="dec-title" id="decTitle">Awaiting input</div>
+            <div class="dec-conf" id="decConf">conf: —</div>
+          </div>
+          <div class="dec-rationale" id="decRat">
+            Pick a vehicle on the left or run a planning cycle.
+          </div>
+          <div class="dec-actions" id="decActions">
+            <div class="dec-action">
+              <div class="dec-action-label">next stop</div>
+              <div class="dec-action-val">—</div>
+            </div>
+            <div class="dec-action">
+              <div class="dec-action-label">eta</div>
+              <div class="dec-action-val">—</div>
+            </div>
+            <div class="dec-action">
+              <div class="dec-action-label">action</div>
+              <div class="dec-action-val">—</div>
+            </div>
+          </div>
+          <div class="dec-savings" id="decSavings">
+            <div class="savings-item"><small>€ saved</small><b id="savEur">—</b></div>
+            <div class="savings-item"><small>CO₂ saved</small><b id="savCo2">—</b></div>
+            <div class="savings-item"><small>VAT recovered</small><b id="savVat">—</b></div>
+          </div>
+        </div>
+
+        <div class="map">
+          <div class="map-grid"></div>
+          <div class="map-label" style="top: 12px; left: 14px;">SECTOR · DE-NRW</div>
+          <div id="mapNodes"></div>
+        </div>
+
+        <div class="trace" id="trace">
+          <div style="color: var(--text-dim); text-align:center;">// awaiting agent activity</div>
+        </div>
+
+        <div class="actions">
+          <button class="btn primary" id="planBtn" onclick="togglePlan()">▶ Run planning cycle</button>
+          <button class="btn" onclick="injectAlert()">⚠ Inject SoC alert</button>
+          <button class="btn" onclick="injectMaint()">🔧 Inject maintenance signal</button>
+          <button class="btn" onclick="reset()">↺ Reset session</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- RIGHT: Stats -->
+    <div>
+      <div class="kpi-stack">
+        <div class="kpi">
+          <div class="kpi-label">€ saved · session</div>
+          <div class="kpi-val" id="kpiEur">€0</div>
+          <div class="kpi-sub" id="kpiEurSub">vs. driver-default routing</div>
+        </div>
+        <div class="kpi cyan">
+          <div class="kpi-label">CO₂ avoided · session</div>
+          <div class="kpi-val" id="kpiCo2">0 kg</div>
+          <div class="kpi-sub">routing toward EnBW renewable mix</div>
+        </div>
+        <div class="kpi amber">
+          <div class="kpi-label">VAT auto-recovered</div>
+          <div class="kpi-val" id="kpiVat">€0</div>
+          <div class="kpi-sub">cross-border refunds queued</div>
+        </div>
+        <div class="kpi magenta">
+          <div class="kpi-label">downtime avoided</div>
+          <div class="kpi-val" id="kpiDown">0h</div>
+          <div class="kpi-sub">predictive maintenance triggers</div>
+        </div>
+        <div class="kpi" style="--green: #67e8f9;">
+          <div class="kpi-label">decisions per minute</div>
+          <div class="kpi-val cyan" id="kpiRate">0</div>
+          <div class="kpi-sub" id="kpiUptime">uptime: 00:00:00</div>
+        </div>
+        <div class="kpi" style="background: var(--bg-deep); border-style: dashed;">
+          <div class="kpi-label">ENERGY MIX (SOURCED)</div>
+          <div style="display: flex; gap:6px; margin: 8px 0; height: 18px;">
+            <div style="flex: 5; background: var(--green); border-radius: 2px;" title="solar+wind"></div>
+            <div style="flex: 2; background: var(--cyan); border-radius: 2px;" title="hydro"></div>
+            <div style="flex: 2; background: var(--amber); border-radius: 2px;" title="grid"></div>
+            <div style="flex: 1; background: var(--text-dim); border-radius: 2px;" title="fossil"></div>
+          </div>
+          <div style="font-family: 'Azeret Mono', monospace; font-size: .58rem; color: var(--text-mute); display: flex; justify-content: space-between;">
+            <span style="color: var(--green);">renew 50%</span>
+            <span style="color: var(--cyan);">hydro 20%</span>
+            <span style="color: var(--amber);">grid 20%</span>
+            <span>fossil 10%</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="footer">
+    <span>FleetCopilot-EV · proto v0.4 · S. Maheswaran</span>
+    <span>EDENRED // GROUP AGENTIC AI FACTORY</span>
+  </div>
+</main>
+
+<div class="toast" id="toast">
+  <div>
+    <div class="toast-title" id="toastTitle">Online</div>
+    <div class="toast-msg" id="toastMsg">Orchestrator armed</div>
+  </div>
+</div>
+
+<script>
+const fleet = [
+  {id:'EV-DE-0142', driver:'A. Becker',  model:'ID.4',          route:'Düsseldorf → Köln',     soc: 38, status:'driving', km:184, alert:false},
+  {id:'EV-DE-0156', driver:'M. Gärtner', model:'eTron GT',      route:'Frankfurt → Stuttgart', soc: 71, status:'driving', km:412, alert:false},
+  {id:'EV-DE-0173', driver:'L. Schultz', model:'EQS 580',       route:'Hamburg → Bremen',      soc: 18, status:'alert',   km:88,  alert:true},
+  {id:'EV-FR-0214', driver:'C. Lefèvre', model:'Mégane E-Tech', route:'Lille → Paris',         soc: 84, status:'charging',km:241, alert:false},
+  {id:'EV-DE-0218', driver:'T. Klein',   model:'Taycan 4S',     route:'Berlin → Leipzig',      soc: 52, status:'driving', km:198, alert:false},
+  {id:'EV-FR-0301', driver:'S. Marchand',model:'Zoé R135',      route:'Lyon → Grenoble',       soc: 23, status:'driving', km:114, alert:true},
+  {id:'EV-DE-0308', driver:'F. Wagner',  model:'iX xDrive50',   route:'München → Augsburg',    soc: 67, status:'driving', km:78,  alert:false},
+  {id:'EV-DE-0341', driver:'P. Hofmann', model:'ID.7 Pro',      route:'Köln → Aachen',         soc: 45, status:'idle',    km:62,  alert:false},
+  {id:'EV-FR-0410', driver:'N. Berthier',model:'Spring',        route:'Marseille → Aix',       soc: 91, status:'driving', km:33,  alert:false},
+  {id:'EV-DE-0427', driver:'R. Vogel',   model:'EQE 350',       route:'Dortmund → Essen',      soc: 12, status:'alert',   km:21,  alert:true},
+  {id:'EV-FR-0518', driver:'É. Roussel', model:'e-208',         route:'Toulouse → Bordeaux',   soc: 56, status:'driving', km:244, alert:false},
+  {id:'EV-DE-0599', driver:'I. Lange',   model:'iX1',           route:'Hannover → Bielefeld',  soc: 73, status:'charging',km:123, alert:false},
+];
+
+let selected = 0;
+let running = false;
+let cycleTimer = null;
+let traceTimer = null;
+let elapsed = 0;
+let stats = { eur:0, co2:0, vat:0, down:0, decisions:0 };
+
+function bucketSoc(s) { return s > 60 ? 'high' : s > 30 ? 'mid' : 'low'; }
+
+function renderFleet() {
+  const list = document.getElementById('fleetList');
+  list.innerHTML = '';
+  fleet.forEach((v, i) => {
+    const div = document.createElement('div');
+    div.className = 'vehicle' + (i === selected ? ' selected' : '');
+    const cls = bucketSoc(v.soc);
+    div.innerHTML = `
+      <div class="v-row">
+        <div class="v-id">${v.id}</div>
+        <div class="v-meta">${v.km} km</div>
+      </div>
+      <div class="v-driver">${v.driver}</div>
+      <div class="v-status">
+        <span class="v-status-dot ${v.status}"></span>
+        <span>${v.status.toUpperCase()} · ${v.model}</span>
+      </div>
+      <div class="v-bars">
+        <div class="v-bar"><span class="v-bar-label">SOC</span><span class="v-bar-val ${cls === 'high' ? 'green' : cls === 'mid' ? 'amber' : 'red'}">${v.soc}%</span></div>
+        <div class="v-bar"><span class="v-bar-label">RNG</span><span class="v-bar-val">${Math.floor(v.soc*4.2)} km</span></div>
+      </div>
+    `;
+    div.onclick = () => { selected = i; renderFleet(); renderDetail(); };
+    list.appendChild(div);
+  });
+  document.getElementById('fleetCount').textContent = `${fleet.length} active`;
+  document.getElementById('vehCount').textContent = `${fleet.length} / ${fleet.length}`;
+}
+
+function renderDetail() {
+  const v = fleet[selected];
+  document.getElementById('vehId').textContent = `${v.id} · driver ${v.driver}`;
+  document.getElementById('vehName').textContent = `${v.driver} — ${v.model}`;
+  document.getElementById('vehRoute').textContent = v.route;
+  const ce = document.getElementById('vehCharge');
+  ce.textContent = v.soc + '%';
+  ce.className = 'detail-charge ' + bucketSoc(v.soc);
+  renderMap();
+}
+
+function renderMap() {
+  const v = fleet[selected];
+  const nodes = document.getElementById('mapNodes');
+  nodes.innerHTML = '';
+  // Vehicle marker
+  const veh = document.createElement('div');
+  veh.className = 'map-node vehicle';
+  const vx = 12, vy = 50;
+  veh.style.left = vx + '%';
+  veh.style.top = vy + '%';
+  nodes.appendChild(veh);
+  const lab = document.createElement('div');
+  lab.className = 'map-label';
+  lab.style.top = (vy - 4) + '%';
+  lab.style.left = (vx + 3) + '%';
+  lab.textContent = v.id;
+  nodes.appendChild(lab);
+  // Charging stations along route
+  const stations = [
+    {x: 35, y: 35, name: 'EnBW Düsseldorf'},
+    {x: 60, y: 60, name: 'EnBW Solingen'},
+    {x: 85, y: 40, name: 'EnBW Köln-Süd'},
+  ];
+  stations.forEach((s, idx) => {
+    const n = document.createElement('div');
+    n.className = 'map-node charge';
+    n.style.left = s.x + '%';
+    n.style.top = s.y + '%';
+    nodes.appendChild(n);
+    const sl = document.createElement('div');
+    sl.className = 'map-label';
+    sl.style.top = (s.y + 3) + '%';
+    sl.style.left = (s.x + 2) + '%';
+    sl.textContent = s.name;
+    nodes.appendChild(sl);
+  });
+  // Route lines
+  const points = [{x:vx, y:vy}, ...stations.map(s => ({x:s.x, y:s.y}))];
+  for (let i = 0; i < points.length - 1; i++) {
+    const a = points[i], b = points[i+1];
+    const r = document.createElement('div');
+    r.className = 'map-route';
+    const dx = b.x - a.x, dy = b.y - a.y;
+    const len = Math.sqrt(dx*dx + dy*dy);
+    const ang = Math.atan2(dy, dx) * 180 / Math.PI;
+    r.style.left = a.x + '%';
+    r.style.top = a.y + '%';
+    r.style.width = len + '%';
+    r.style.transform = `rotate(${ang}deg)`;
+    nodes.appendChild(r);
+  }
+}
+
+function togglePlan() {
+  if (!running) start(); else stop();
+}
+function start() {
+  running = true;
+  document.getElementById('planBtn').textContent = '⏸ Pause cycle';
+  document.getElementById('planBtn').classList.add('active');
+  toast('Cycle running', 'Multi-agent planner online');
+  cycleTimer = setInterval(planCycle, 3500);
+  traceTimer = setInterval(traceTick, 220);
+  uptimeTimer = setInterval(() => {
+    elapsed++;
+    const h = Math.floor(elapsed/3600), m = Math.floor((elapsed%3600)/60), s = elapsed%60;
+    document.getElementById('kpiUptime').textContent = `uptime: ${pad(h)}:${pad(m)}:${pad(s)}`;
+  }, 1000);
+  planCycle();
+}
+let uptimeTimer = null;
+function stop() {
+  running = false;
+  document.getElementById('planBtn').textContent = '▶ Resume cycle';
+  document.getElementById('planBtn').classList.remove('active');
+  clearInterval(cycleTimer); clearInterval(traceTimer); clearInterval(uptimeTimer);
+  ['charge','toll','vat','maint'].forEach(a => {
+    document.querySelector(`[data-agent="${a}"]`).classList.remove('active');
+    document.getElementById('ag-' + a).textContent = 'idle';
+  });
+  toast('Paused', 'Cycle suspended');
+}
+function reset() {
+  stop();
+  elapsed = 0;
+  stats = { eur:0, co2:0, vat:0, down:0, decisions:0 };
+  document.getElementById('kpiEur').textContent = '€0';
+  document.getElementById('kpiCo2').textContent = '0 kg';
+  document.getElementById('kpiVat').textContent = '€0';
+  document.getElementById('kpiDown').textContent = '0h';
+  document.getElementById('kpiRate').textContent = '0';
+  document.getElementById('kpiUptime').textContent = 'uptime: 00:00:00';
+  document.getElementById('decTitle').textContent = 'Awaiting input';
+  document.getElementById('decRat').textContent = 'Pick a vehicle on the left or run a planning cycle.';
+  document.getElementById('decConf').textContent = 'conf: —';
+  document.getElementById('savEur').textContent = '—';
+  document.getElementById('savCo2').textContent = '—';
+  document.getElementById('savVat').textContent = '—';
+  document.getElementById('trace').innerHTML = '<div style="color: var(--text-dim); text-align:center;">// awaiting agent activity</div>';
+  document.querySelectorAll('.dec-action-val').forEach(e => e.textContent = '—');
+  toast('Reset', 'Session cleared');
+}
+function pad(n) { return n < 10 ? '0'+n : n; }
+
+function planCycle() {
+  const v = fleet[selected];
+  const agents = ['charge','toll','vat','maint'];
+  agents.forEach((a, i) => {
+    setTimeout(() => activateAgent(a), i * 350);
+  });
+  setTimeout(produceDecision, 2000);
+}
+function activateAgent(name) {
+  const el = document.querySelector(`[data-agent="${name}"]`);
+  el.classList.add('active');
+  const labels = {
+    charge: ['querying EnBW api', 'pricing 8k chargers', 'optim window'],
+    toll:   ['fetching toll caches', 'eligibility check', 'consolidating'],
+    vat:    ['cross-border ledger', 'mapping invoices', 'recovery plan'],
+    maint:  ['telematics decode', 'predicting tire/brake', 'sched window']
+  };
+  const txt = pick(labels[name]);
+  document.getElementById('ag-' + name).textContent = txt;
+  setTimeout(() => {
+    el.classList.remove('active');
+    document.getElementById('ag-' + name).textContent = 'ready';
+  }, 1800);
+}
+function produceDecision() {
+  const v = fleet[selected];
+  const decisions = [
+    {
+      title: 'Charge at EnBW Solingen-Hilden',
+      rat: `Vehicle SoC ${v.soc}% trending below threshold within ${rand(18,42)} min. EnBW Solingen-Hilden offers 250kW DC + €0.07/kWh below adjacent stations and currently sources 71% renewable. Toll route via A3 cleared.`,
+      actions: { stop: 'EnBW Solingen', eta: rand(14,38) + ' min', action: 'navigate + reserve 30kWh' },
+      eur: rand(8, 28),
+      co2: (Math.random() * 4.5 + 1.2).toFixed(1) + ' kg',
+      vat: rand(0, 12),
+      down: 0,
+      conf: (88 + Math.random()*10).toFixed(1)
+    },
+    {
+      title: 'Pre-emptive maintenance · Köln depot',
+      rat: `Telematics flagged tire-pressure-rear (Δ -0.4 bar) and predicted brake pad replacement within ${rand(800,2200)} km. Booked ${pick(['Mon','Tue','Wed'])} 08:00 at depot, slotted into low-utilization window. CO₂ + downtime cost lower than reactive.`,
+      actions: { stop: 'Köln depot', eta: '14 hr ahead', action: 'book maint slot' },
+      eur: rand(40, 120),
+      co2: (Math.random() * 2 + 0.5).toFixed(1) + ' kg',
+      vat: 0,
+      down: rand(2,5),
+      conf: (82 + Math.random()*12).toFixed(1)
+    },
+    {
+      title: 'VAT recovery · 3 cross-border invoices',
+      rat: `Detected ${rand(3,7)} invoices crossing DE↔FR↔NL within last 14 days. Auto-classified, ledger-mapped, refund queued through Edenred VAT engine. Net recovery cycle: 22 days.`,
+      actions: { stop: 'submit batch', eta: 'queued', action: 'auto-file' },
+      eur: rand(140, 480),
+      co2: '0.0 kg',
+      vat: rand(140, 480),
+      down: 0,
+      conf: (94 + Math.random()*5).toFixed(1)
+    },
+    {
+      title: 'Re-route toll · A4 closure detected',
+      rat: `Live toll-feed flagged A4-Eichberg closure for 72 min. Alternate via A45 adds 14 km but saves ${rand(12,28)} min idle and €${rand(3,8)} effective toll. Driver app notified, ETA refreshed.`,
+      actions: { stop: 'A45 reroute', eta: rand(8,16) + ' min', action: 'push driver alert' },
+      eur: rand(3, 12),
+      co2: (Math.random() * 1.5 + 0.2).toFixed(1) + ' kg',
+      vat: 0,
+      down: 0,
+      conf: (91 + Math.random()*7).toFixed(1)
+    },
+  ];
+  const d = pick(decisions);
+  document.getElementById('decTitle').textContent = d.title;
+  document.getElementById('decRat').textContent = d.rat;
+  document.getElementById('decConf').textContent = `conf: ${d.conf}%`;
+  const acts = document.querySelectorAll('.dec-action-val');
+  acts[0].textContent = d.actions.stop;
+  acts[1].textContent = d.actions.eta;
+  acts[2].textContent = d.actions.action;
+  document.getElementById('savEur').textContent = '€' + d.eur;
+  document.getElementById('savCo2').textContent = d.co2;
+  document.getElementById('savVat').textContent = '€' + d.vat;
+
+  stats.eur += d.eur;
+  stats.co2 += parseFloat(d.co2);
+  stats.vat += d.vat;
+  stats.down += d.down;
+  stats.decisions++;
+
+  document.getElementById('kpiEur').textContent = '€' + stats.eur;
+  document.getElementById('kpiCo2').textContent = stats.co2.toFixed(1) + ' kg';
+  document.getElementById('kpiVat').textContent = '€' + stats.vat;
+  document.getElementById('kpiDown').textContent = stats.down + 'h';
+  document.getElementById('kpiRate').textContent = (stats.decisions / Math.max(1, elapsed) * 60).toFixed(1);
+}
+
+function traceTick() {
+  if (!running) return;
+  const types = [
+    {a:'charge', cls:'charge', t: () => `[CHARGE] ${pick(['EnBW api','open-charge map','price-feed'])} :: pulled ${rand(20,400)} stations · cached`},
+    {a:'toll', cls:'toll', t: () => `[TOLL] ${pick(['Toll4Europe','VIA-T','Asfinag'])} :: liability ${rand(0,18)}€ · vat-eligible=${pick(['true','true','false'])}`},
+    {a:'vat', cls:'vat', t: () => `[VAT  ] inv_${rand(10000,99999)} · DE→${pick(['FR','NL','BE'])} · pre-tax ${rand(40,800)}€ · refund=auto`},
+    {a:'maint', cls:'maint', t: () => `[MAINT] sensor_${rand(100,999)} :: ${pick(['tire_p','brake_pad','batt_health','coolant'])} · ${pick(['nominal','watch','degraded'])}`},
+    {a:'orch', cls:'orch', t: () => `[ORCH ] reduce :: ${pick(['cost','co2','time'])} weight=${(0.3 + Math.random()*0.5).toFixed(2)} · plan revised`},
+  ];
+  const t = pick(types);
+  const time = new Date().toTimeString().slice(0,8);
+  const line = document.createElement('div');
+  line.className = 'trace-line';
+  line.innerHTML = `<span class="ts">${time}</span><span class="agnt ${t.cls}">${t.a}</span><span class="msg">${t.t()}</span>`;
+  const trace = document.getElementById('trace');
+  if (trace.querySelector('div[style*="text-align"]')) trace.innerHTML = '';
+  trace.insertBefore(line, trace.firstChild);
+  while (trace.children.length > 18) trace.lastChild.remove();
+}
+
+function injectAlert() {
+  const v = fleet[selected];
+  v.soc = Math.max(8, v.soc - 25);
+  v.status = 'alert';
+  v.alert = true;
+  renderFleet(); renderDetail();
+  if (!running) start();
+  toast('SoC alert injected', `${v.id} dropped to ${v.soc}%`);
+}
+function injectMaint() {
+  toast('Maintenance signal', 'Tire-pressure delta -0.4 bar');
+  if (!running) start();
+}
+
+function pick(arr) { return arr[Math.floor(Math.random()*arr.length)]; }
+function rand(a,b) { return Math.floor(a + Math.random()*(b-a)); }
+
+renderFleet();
+renderDetail();
+</script>
+</body>
+</html>
